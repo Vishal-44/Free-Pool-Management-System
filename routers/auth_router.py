@@ -14,8 +14,9 @@ auth_service = AuthService()
 
 @router.post("/login", response_model=APIResponse)
 async def login(payload: AuthRequest):
-    response = auth_service.login(payload)
+    response, auth_headers = auth_service.login(payload)
     return JSONResponse(
         status_code = status.HTTP_200_OK,
-        content = response.model_dump()
+        content = response.model_dump(),
+        headers = auth_headers
     )

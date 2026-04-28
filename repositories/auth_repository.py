@@ -13,7 +13,7 @@ class AuthRepository(DatabaseService):
     
     def is_admin(self, body:AuthRequest) -> Admin:
         with self.get_session() as session:
-            query = session.query(Admin.password)
+            query = session.query(Admin.id, Admin.email, Admin.password)   
             if body.username:
                 query = query.filter(Admin.username == body.username)
             elif body.email:
