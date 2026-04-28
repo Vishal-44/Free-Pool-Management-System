@@ -3,7 +3,10 @@ from exceptions import NotFoundException, UnAuthorizedException
 from repositories.auth_repository import AuthRepository
 from serializers.auth import AuthRequest
 from serializers.response import APIResponse
-from utils.auth_utils import validate_payload
+from utils.auth_utils import (
+    validate_payload, 
+    get_auth_header
+)
 
 class AuthService:
     
@@ -17,9 +20,7 @@ class AuthService:
     def __init__(self):
         self.auth_service = JWTAuthenticationService()
         self.auth_repository = AuthRepository()
-
-    def generate_token(self, payload):
-        return self.auth_service.create_jwt_token(payload)
+    
     
     def login(self, body: AuthRequest):
         validate_payload(body)
@@ -32,9 +33,9 @@ class AuthService:
         if not match:
             raise UnAuthorizedException("Invalid credentials: Incorrect password")
 
-        token_payload = {"admin_info": body.username or body.email}
-        token = self.generate_token(token_payload)
+        admin_data = {"id": admin.id, "email": admin.email}
+        auth_headers = get_auth_header(payload=admin_data)
+        
         return APIResponse(
-            message="Login successful",
-            data={"token": token}
-        )
+            message="Login successful"
+        ), auth_headers

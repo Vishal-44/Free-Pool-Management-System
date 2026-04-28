@@ -5,6 +5,9 @@ from constants.middleware_constant import (
     CONFIGURED_AUTH_SERVICE,
     UNAUTHENTICATED_ENDPOINTS
 )
+from constants.exception_constants import (
+    AUTH_SERVICE_NOT_CONFIGURED_MESSAGE
+)
 
 class AuthenticationMiddleware(BaseHTTPMiddleware):
 
@@ -16,8 +19,10 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
     
 
     def get_auth_service(self):
-        return self.authentication_registry.get(self.configured_auth_service, None)
-    
+        auth_service = self.authentication_registry.get(self.configured_auth_service, None)
+        if not auth_service:
+            raise Exception(AUTH_SERVICE_NOT_CONFIGURED_MESSAGE)
+        return auth_service
 
     def should_skip_authentication(self, request):
         return request.url.path in self.unauthenticated_endpoints

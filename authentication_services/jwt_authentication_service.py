@@ -30,7 +30,7 @@ class JWTAuthenticationService(BaseAuthService):
             raise ValueError("JWT_SECRET_KEY is not configured in environment variables.")
     
 
-    def create_jwt_token(self, payload: dict) -> str:
+    def create_auth_headers(self, payload: dict) -> str:
         """
         Generate a signed JWT token.
  
@@ -48,10 +48,13 @@ class JWTAuthenticationService(BaseAuthService):
                 "iat": now,                                          # issued-at
                 "exp": now + timedelta(seconds=self.jwt_expiry),    # expiry
             }
+
             token = jwt.encode(claims, self.jwt_secret_key, algorithm=self.jwt_algorithm)
+            return {
+                "X-access-token": token
+            }
         except JWTError as e:
             raise JWTGenerationException()
-        return token
     
     
     @staticmethod
