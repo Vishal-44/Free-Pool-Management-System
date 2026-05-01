@@ -10,7 +10,7 @@ from constants.exception_constants import (
     MISSING_JWT_TOKEN_EXCEPTION_MESSAGE
 )
 from exceptions import (
-    UnAuthorizedException,
+    UnAutenticatedException,
     JWTGenerationException
 )
 
@@ -36,7 +36,7 @@ class JWTAuthenticationService(BaseAuthService):
  
         Args:
             payload: Arbitrary claims to embed in the token
-                     (e.g. {"sub": user_id, "role": "admin"}).
+                     (e.g. {"email": "user1@example.com"}).
  
         Returns:
             A signed JWT string.
@@ -62,12 +62,12 @@ class JWTAuthenticationService(BaseAuthService):
 
         authentication_header = request.headers.get("Authorization", None)
         if authentication_header is None or not authentication_header.startswith("Bearer "):
-            raise UnAuthorizedException(message = MISSING_HEADER_EXCEPTION_MESSAGE)
+            raise UnAutenticatedException(message = MISSING_HEADER_EXCEPTION_MESSAGE)
         
         token = authentication_header[7:].strip()
 
         if not token:
-            raise UnAuthorizedException(message = MISSING_JWT_TOKEN_EXCEPTION_MESSAGE)
+            raise UnAutenticatedException(message = MISSING_JWT_TOKEN_EXCEPTION_MESSAGE)
         
         return token
     
@@ -79,30 +79,33 @@ class JWTAuthenticationService(BaseAuthService):
                 self.jwt_secret_key,
                 algorithms=[self.jwt_algorithm]
             )
-            return claims
-        
+            email = claims.get("email", None)
+
+            if not email:
+                raise UnAutenticatedException()
+            
+            return {"email": email}
+         
         except JWTError as e:
-            print(str(e))
-            raise UnAuthorizedException()
+            raise UnAutenticatedException()
 
     
     def authenticate(self, request):
         try:
             token = self._extract_jwt_token(request)
             claims = self.validate_jwt_token(token)
-            request.state.user_claims = claims
+            request.state.user = claims
             return True, None
         
         except Exception as e:
             
-            if isinstance(e, UnAuthorizedException):
+            if isinstance(e, UnAutenticatedException):
                 return False, JSONResponse(
                     status_code=e.status_code,
                     content={
                         "message": str(e)
                     }
             )
-            print(str(e))
             return False, JSONResponse(
                 status_code=500,
                 content={

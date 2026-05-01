@@ -1,9 +1,10 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Request
 from fastapi.responses import JSONResponse
 
 from serializers.admin import EmployeeOnboardRequest
 from serializers.response import APIResponse
 from services.admin_service import AdminService
+from middlewares.authorization import requires_admin_role
 from constants.response_constants import EMPLOYEE_ONBOARD_SUCCESS_MESSAGE
 
 router = APIRouter(
@@ -14,7 +15,8 @@ router = APIRouter(
 admin_service = AdminService()
 
 @router.post("/employees", response_model=APIResponse)
-async def onboard_employee(payload: EmployeeOnboardRequest):
+@requires_admin_role()
+async def onboard_employee(request: Request, payload: EmployeeOnboardRequest):
     onboard_response = admin_service.onboard_employee(payload)
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,

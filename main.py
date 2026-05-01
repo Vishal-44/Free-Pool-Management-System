@@ -11,7 +11,7 @@ from configs.app_config import routers
 from exceptions import (
     BaseException,
     InvalidRequestException, 
-    UnAuthorizedException, 
+    UnAutenticatedException, 
     NotFoundException,
     AlreadyExistsException
 )
