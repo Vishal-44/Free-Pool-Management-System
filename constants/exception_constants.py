@@ -1,6 +1,7 @@
-MISSING_HEADER_EXCEPTION_MESSAGE = "Unauthorized: Missing or Invalid Authorization header."
-MISSING_JWT_TOKEN_EXCEPTION_MESSAGE = "Unauthorized: Missing JWT token."
-UNAUTHORIZED_EXCEPTION_MESSAGE = "Unauthorized: Authentication failed."
+MISSING_HEADER_EXCEPTION_MESSAGE = "Unauthenticated: Missing or Invalid Authorization header."
+MISSING_JWT_TOKEN_EXCEPTION_MESSAGE = "Unauthenticated: Missing JWT token."
+UNAUTHENTICATED_EXCEPTION_MESSAGE = "Unauthenticated: Authentication failed."
+UNAUTHORIZED_EXCEPTION_MESSAGE = "Unauthorized: User don't have required access or permissions."
 
 INTERNAL_SERVER_ERROR_MESSAGE = "Internal Server Error: An unexpected error occurred."
 INVALID_REQUEST_MESSAGE = "Invalid request data: Please check your input and try again."

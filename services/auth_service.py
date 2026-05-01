@@ -1,5 +1,5 @@
 from authentication_services.jwt_authentication_service import JWTAuthenticationService
-from exceptions import NotFoundException, UnAuthorizedException
+from exceptions import NotFoundException, UnAutenticatedException
 from repositories.auth_repository import AuthRepository
 from serializers.auth import AuthRequest
 from serializers.response import APIResponse
@@ -31,9 +31,9 @@ class AuthService:
         
         match = admin.password == body.password
         if not match:
-            raise UnAuthorizedException("Invalid credentials: Incorrect password")
+            raise UnAutenticatedException("Invalid credentials: Incorrect password")
 
-        admin_data = {"id": admin.id, "email": admin.email}
+        admin_data = {"email": admin.email}
         auth_headers = get_auth_header(payload=admin_data)
         
         return APIResponse(
