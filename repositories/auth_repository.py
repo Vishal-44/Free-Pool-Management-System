@@ -1,6 +1,7 @@
 from storage_services.database_service import DatabaseService
-from serializers.auth import AuthRequest
-from storage_services.db_models import Admin
+from serializers.auth import AuthRequest, EmployeeLoginRequest
+from storage_services.db_models import Admin, Employee
+from storage_services.types import EmployeeStatus
 
 class AuthRepository(DatabaseService):
 
@@ -20,3 +21,9 @@ class AuthRepository(DatabaseService):
                 query = query.filter(Admin.email == body.email)
             admin = query.first()
             return admin    
+    
+    def is_employee(self, body: EmployeeLoginRequest):
+        with self.get_session() as session:
+            query = session.query(Employee.id, Employee.email, Employee.password).filter(Employee.email == body.email, Employee.status == EmployeeStatus.WORKING)
+            employee = query.first()
+            return employee
