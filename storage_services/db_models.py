@@ -240,7 +240,7 @@ class EmployeeSkillMap(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     employee_id = Column(Integer, ForeignKey('employees.id'), nullable=False)
     skill_id = Column(Integer, ForeignKey('skills.id'), nullable=False)
-    skill_level = Column(Enum(EmployeeSkillLevel), nullable=False)
+    skill_level = Column(Enum(EmployeeSkillLevel, name = "employee_skill_level"), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 

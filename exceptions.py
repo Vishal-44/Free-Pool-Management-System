@@ -5,7 +5,10 @@ from constants.exception_constants import (
     NOT_FOUND_EXCEPTION_MESSAGE,
     UNAUTHENTICATED_EXCEPTION_MESSAGE,
     ALREADY_EXISTS_EXCEPTION_MESSAGE,
-    UNAUTHORIZED_EXCEPTION_MESSAGE
+    UNAUTHORIZED_EXCEPTION_MESSAGE,
+    JWT_GENERATION_EXCEPTION_MESSAGE,
+    UNSUPPORTED_FILE_EXCEPTION_MESSAGE,
+    LARGE_FILE_EXCEPTION_MESSAGE
 )
 class BaseException(Exception):
     def __init__(self, message):
@@ -38,5 +41,16 @@ class AlreadyExistsException(BaseException):
         super().__init__(message)
 
 class JWTGenerationException(BaseException):
-    def __init__(self, message="Failed to generate JWT token"):
+    def __init__(self, message=JWT_GENERATION_EXCEPTION_MESSAGE):
+        self.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        super().__init__(message)
+
+class UnSupportedFileException(BaseException):
+    def __init__(self, message=UNSUPPORTED_FILE_EXCEPTION_MESSAGE):
+        self.status_code = status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+        super().__init__(message)
+
+class LargeFileException(BaseException):
+    def __init__(self, message=LARGE_FILE_EXCEPTION_MESSAGE):
+        self.status_code = status.HTTP_413_CONTENT_TOO_LARGE
         super().__init__(message)
