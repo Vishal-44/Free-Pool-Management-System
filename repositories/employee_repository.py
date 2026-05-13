@@ -38,8 +38,6 @@ class EmployeeRepository(DatabaseService):
             if skills is not None:
                 self._update_skills(skills=skills, employee=employee, session=session)
 
-            session.commit()
-            session.refresh(employee)
             return employee
 
     def _update_skills(self, skills: List[SkillModel], employee: Employee, session) -> None:
