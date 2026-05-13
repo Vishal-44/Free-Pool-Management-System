@@ -13,3 +13,4 @@ NOT_FOUND_EXCEPTION_MESSAGE = "Resource not found: The requested resource does n
 ALREADY_EXISTS_EXCEPTION_MESSAGE = "Resource already exists: The provided resource is already registered."
 
 AUTH_SERVICE_NOT_CONFIGURED_MESSAGE = "Authentication service is not configured properly."
+MISSING_QUERY_PARAM_MESSAGE = "Search query parameter 'query' is required."

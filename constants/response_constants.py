@@ -3,3 +3,4 @@ EMPLOYEE_ALREADY_EXISTS_MESSAGE = "An employee with this email already exists."
 DESIGNATION_NOT_FOUND_MESSAGE = "Designation not found."
 
 EMPLOYEE_PROFILE_UPDATED_MESSAGE = "Profile updated successfully."
+EMPLOYEE_SEARCH_SUCCESS_MESSAGE = "Employees fetched successfully."

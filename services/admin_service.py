@@ -1,8 +1,12 @@
 from exceptions import AlreadyExistsException, NotFoundException
 from repositories.admin_repository import AdminRepository
-from serializers.admin import EmployeeOnboardRequest, EmployeeOnboardResponse
+from serializers.admin import (
+    EmployeeOnboardRequest, EmployeeOnboardResponse,
+    EmployeeSearchResponse,
+)
 from constants.response_constants import EMPLOYEE_ALREADY_EXISTS_MESSAGE, DESIGNATION_NOT_FOUND_MESSAGE
 from utils.password_utils import generate_random_password
+from utils.employee_utils import to_employee_search_result
 
 class AdminService:
 
@@ -32,3 +36,8 @@ class AdminService:
             email=employee.email,
             password=generated_password
         )
+
+    def search_employees(self, query: str, page: int, page_size: int) -> EmployeeSearchResponse:
+        total, employees = self.admin_repository.search_employees(query, page, page_size)
+        items = [to_employee_search_result(e) for e in employees]
+        return EmployeeSearchResponse(total=total, page=page, page_size=page_size, items=items)
