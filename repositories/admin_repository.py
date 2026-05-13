@@ -33,7 +33,6 @@ class AdminRepository(DatabaseService):
                     designation_id=designation.id
                 )
             )
-            session.refresh(employee)
             return employee
     
     def get_designation_by_name(self, name: str) -> Designation | None:
