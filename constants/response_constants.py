@@ -4,3 +4,4 @@ DESIGNATION_NOT_FOUND_MESSAGE = "Designation not found."
 
 EMPLOYEE_PROFILE_UPDATED_MESSAGE = "Profile updated successfully."
 EMPLOYEE_SEARCH_SUCCESS_MESSAGE = "Employees fetched successfully."
+EMPLOYEE_LIST_SUCCESS_MESSAGE = "Employees listed successfully."
