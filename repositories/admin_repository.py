@@ -1,11 +1,13 @@
 from datetime import datetime
-from sqlalchemy import or_
+from sqlalchemy import func, or_
+from sqlalchemy.orm import joinedload, selectinload
 
 from storage_services.database_service import DatabaseService
 from storage_services.db_models import (
-    Certification, Designation, DesignationRecord, Employee,
-    EmployeeCertificationMap, EmployeeSkillMap, Skill,
+    Certification, Department, Designation, DesignationRecord, Employee,
+    EmployeeCertificationMap, EmployeeSkillMap, ProjectEmployeeMap, Skill,
 )
+from storage_services.types import EmployeeStatus
 from serializers.admin import EmployeeOnboardRequest
 
 class AdminRepository(DatabaseService):
@@ -48,6 +50,11 @@ class AdminRepository(DatabaseService):
             query = f"%{query}%"
             base = (
                 session.query(Employee)
+                .options(
+                    selectinload(Employee.designation_records)
+                        .joinedload(DesignationRecord.designation)
+                        .joinedload(Designation.department),
+                )
                 .distinct()
                 .outerjoin(Employee.skill_maps)
                 .outerjoin(EmployeeSkillMap.skill)
@@ -64,13 +71,63 @@ class AdminRepository(DatabaseService):
             )
             total = base.count()
             employees = base.offset((page - 1) * page_size).limit(page_size).all()
+            return total, employees
 
-            # Trigger lazy-load of the designation chain while session is open.
-            # current_designation / current_department are properties on Employee
-            # that filter designation_records to the active record (end_date is None).
-            for emp in employees:
-                _ = emp.current_designation
-                _ = emp.current_department
+    def list_employees(
+        self,
+        status: EmployeeStatus | None,
+        department: str | None,
+        designation: str | None,
+        skills: list[str] | None,
+        page: int,
+        page_size: int,
+    ) -> tuple[int, list[Employee]]:
+        with self.get_session() as session:
+            base = session.query(Employee).options(
+                selectinload(Employee.designation_records)
+                    .joinedload(DesignationRecord.designation)
+                    .joinedload(Designation.department),
+                selectinload(Employee.project_maps)
+                    .joinedload(ProjectEmployeeMap.project),
+            )
 
+            if department is not None or designation is not None:
+                base = (
+                    base
+                    .join(Employee.designation_records)
+                    .filter(DesignationRecord.end_date.is_(None))
+                    .join(DesignationRecord.designation)
+                )
+                if designation is not None:
+                    base = base.filter(func.lower(Designation.name) == designation.lower())
+                if department is not None:
+                    base = base.join(Designation.department).filter(
+                        func.lower(Department.name) == department.lower()
+                    )
+
+            if skills:
+                # AND across skills: employee must have every skill listed.
+                distinct_skills = list({s.lower() for s in skills})
+                skill_match_subquery = (
+                    session.query(EmployeeSkillMap.employee_id)
+                    .join(EmployeeSkillMap.skill)
+                    .filter(func.lower(Skill.name).in_(distinct_skills))
+                    .group_by(EmployeeSkillMap.employee_id)
+                    .having(func.count(func.distinct(Skill.id)) == len(distinct_skills))
+                )
+                base = base.filter(Employee.id.in_(skill_match_subquery))
+
+            if status is not None:
+                base = base.filter(Employee.status == status)
+
+            base = base.distinct()
+
+            total = base.count()
+            employees = (
+                base.order_by(Employee.id)
+                    .offset((page - 1) * page_size)
+                    .limit(page_size)
+                    .all()
+            )
             return total, employees
 

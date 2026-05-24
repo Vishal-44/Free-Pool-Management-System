@@ -1,12 +1,13 @@
 from exceptions import AlreadyExistsException, NotFoundException
 from repositories.admin_repository import AdminRepository
 from serializers.admin import (
-    EmployeeOnboardRequest, EmployeeOnboardResponse,
+    EmployeeListResponse, EmployeeOnboardRequest, EmployeeOnboardResponse,
     EmployeeSearchResponse,
 )
 from constants.response_constants import EMPLOYEE_ALREADY_EXISTS_MESSAGE, DESIGNATION_NOT_FOUND_MESSAGE
+from storage_services.types import EmployeeStatus
 from utils.password_utils import generate_random_password
-from utils.employee_utils import to_employee_search_result
+from utils.employee_utils import to_employee_list_item, to_employee_search_result
 
 class AdminService:
 
@@ -41,3 +42,25 @@ class AdminService:
         total, employees = self.admin_repository.search_employees(query, page, page_size)
         items = [to_employee_search_result(e) for e in employees]
         return EmployeeSearchResponse(total=total, page=page, page_size=page_size, items=items)
+
+    def list_employees(
+        self,
+        status: EmployeeStatus | None,
+        department: str | None,
+        designation: str | None,
+        skill: list[str] | None,
+        page: int,
+        page_size: int,
+    ) -> EmployeeListResponse:
+        skills = [s for s in skill if s] if skill else None
+
+        total, employees = self.admin_repository.list_employees(
+            status=status,
+            department=department,
+            designation=designation,
+            skills=skills,
+            page=page,
+            page_size=page_size,
+        )
+        items = [to_employee_list_item(e) for e in employees]
+        return EmployeeListResponse(total=total, page=page, page_size=page_size, items=items)

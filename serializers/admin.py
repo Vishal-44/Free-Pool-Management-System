@@ -21,3 +21,20 @@ class EmployeeSearchResponse(BaseModel):
     page: int
     page_size: int
     items: list[EmployeeSearchResult]
+
+
+class EmployeeListItem(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+    designation: str | None
+    department: str | None
+    status: str
+    current_project: str | None
+
+
+class EmployeeListResponse(BaseModel):
+    total: int
+    page: int
+    page_size: int
+    items: list[EmployeeListItem]

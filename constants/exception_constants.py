@@ -14,3 +14,4 @@ ALREADY_EXISTS_EXCEPTION_MESSAGE = "Resource already exists: The provided resour
 
 AUTH_SERVICE_NOT_CONFIGURED_MESSAGE = "Authentication service is not configured properly."
 MISSING_QUERY_PARAM_MESSAGE = "Search query parameter 'query' is required."
+INVALID_PAGINATION_MESSAGE = "page and page_size must be positive integers."
