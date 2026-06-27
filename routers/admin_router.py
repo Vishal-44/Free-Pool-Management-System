@@ -11,6 +11,7 @@ from constants.response_constants import (
     EMPLOYEE_LIST_SUCCESS_MESSAGE,
     EMPLOYEE_ONBOARD_SUCCESS_MESSAGE,
     EMPLOYEE_SEARCH_SUCCESS_MESSAGE,
+    SKILL_LIST_SUCCESS_MESSAGE,
 )
 from exceptions import InvalidRequestException
 from constants.exception_constants import (
@@ -24,6 +25,28 @@ router = APIRouter(
 )
 
 admin_service = AdminService()
+
+@router.get("/skills", response_model=APIResponse)
+async def list_skills(
+    domain: str | None = None,
+    page: int = 1,
+    page_size: int = 10,
+):
+    if page < 1 or page_size < 1:
+        raise InvalidRequestException(INVALID_PAGINATION_MESSAGE)
+
+    result = admin_service.list_skills(
+        domain=domain,
+        page=page,
+        page_size=page_size,
+    )
+    return JSONResponse(
+        status_code=fastapi_status.HTTP_200_OK,
+        content=APIResponse(
+            message=SKILL_LIST_SUCCESS_MESSAGE,
+            data=result.model_dump()
+        ).model_dump()
+    )
 
 @router.get("/employees/search", response_model=APIResponse)
 @requires_admin_role()

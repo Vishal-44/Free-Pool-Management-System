@@ -131,3 +131,23 @@ class AdminRepository(DatabaseService):
             )
             return total, employees
 
+    def list_skills(
+        self,
+        domain: str | None,
+        page: int,
+        page_size: int,
+    ) -> tuple[int, list[Skill]]:
+        with self.get_session() as session:
+            base = session.query(Skill)
+
+            if domain is not None:
+                base = base.filter(func.lower(Skill.domain) == domain.lower())
+
+            total = base.count()
+            skills = (
+                base.order_by(Skill.domain, Skill.name)
+                    .offset((page - 1) * page_size)
+                    .limit(page_size)
+                    .all()
+            )
+            return total, skills

@@ -38,3 +38,16 @@ class EmployeeListResponse(BaseModel):
     page: int
     page_size: int
     items: list[EmployeeListItem]
+
+
+class SkillItem(BaseModel):
+    id: int
+    name: str
+    domain: str
+
+
+class SkillListResponse(BaseModel):
+    total: int
+    page: int
+    page_size: int
+    items: list[SkillItem]
