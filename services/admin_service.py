@@ -2,7 +2,7 @@ from exceptions import AlreadyExistsException, NotFoundException
 from repositories.admin_repository import AdminRepository
 from serializers.admin import (
     EmployeeListResponse, EmployeeOnboardRequest, EmployeeOnboardResponse,
-    EmployeeSearchResponse,
+    EmployeeSearchResponse, SkillItem, SkillListResponse,
 )
 from constants.response_constants import EMPLOYEE_ALREADY_EXISTS_MESSAGE, DESIGNATION_NOT_FOUND_MESSAGE
 from storage_services.types import EmployeeStatus
@@ -64,3 +64,20 @@ class AdminService:
         )
         items = [to_employee_list_item(e) for e in employees]
         return EmployeeListResponse(total=total, page=page, page_size=page_size, items=items)
+
+    def list_skills(
+        self,
+        domain: str | None,
+        page: int,
+        page_size: int,
+    ) -> SkillListResponse:
+        total, skills = self.admin_repository.list_skills(
+            domain=domain,
+            page=page,
+            page_size=page_size,
+        )
+        items = [
+            SkillItem(id=skill.id, name=skill.name, domain=skill.domain)
+            for skill in skills
+        ]
+        return SkillListResponse(total=total, page=page, page_size=page_size, items=items)
